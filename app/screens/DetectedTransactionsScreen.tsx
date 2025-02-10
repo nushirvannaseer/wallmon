@@ -2,7 +2,7 @@ import { FC, useEffect, useState } from "react"
 import { observer } from "mobx-react-lite"
 import { TextStyle, View, ViewStyle } from "react-native"
 import { AppStackScreenProps } from "@/navigators"
-import { Button, Card, Icon, Screen, Text } from "@/components"
+import { Button, Card, Icon, Screen, Switch, Text } from "@/components"
 import { load, save } from "@/utils/storage"
 import { colors } from "@/theme"
 import { Expense, Notification } from "@/types/Storage"
@@ -12,6 +12,7 @@ interface DetectedTransactionsScreenProps extends AppStackScreenProps<"DetectedT
 export const DetectedTransactionsScreen: FC<DetectedTransactionsScreenProps> = observer(
   function DetectedTransactionsScreen() {
     const [history, setHistory] = useState<Notification[]>([])
+    const [showOnlyTransactions, setShowOnlyTransactions] = useState<boolean>(true)
 
     useEffect(() => {
       const loadHistory = async () => {
@@ -45,52 +46,64 @@ export const DetectedTransactionsScreen: FC<DetectedTransactionsScreenProps> = o
     return (
       <Screen style={$root} preset="scroll" safeAreaEdges={["top", "bottom"]}>
         <Text text="detectedTransactions" />
+        <Switch
+          value={showOnlyTransactions}
+          onValueChange={() => setShowOnlyTransactions(!showOnlyTransactions)}
+        />
         <View>
-          {history.map((response) => (
-            <Card
-              key={response.id}
-              preset="reversed"
-              headingStyle={$cardHeadingStyle}
-              heading={response.summary}
-              contentStyle={$cardContentStyle}
-              ContentComponent={
-                <View>
-                  <Text style={$cardContentStyle} text={`Transaction: ${response.isTransaction}`} />
-                  <Text
-                    style={$cardContentStyle}
-                    text={`From: ${response.transactionDetails?.from}`}
-                  />
-                  <Text style={$cardContentStyle} text={`To: ${response.transactionDetails?.to}`} />
-                  <Text
-                    style={$cardContentStyle}
-                    text={`App: ${response.transactionDetails?.detectedFromApp}`}
-                  />
-                  <Text style={$cardContentStyle} text={`${response.summary}`} />
-                  <View style={$cardFooterContainer}>
-                    <Button
-                      text="Add to history"
-                      preset="filled"
-                      style={{ backgroundColor: colors.palette.secondary500 }}
-                      onPress={() => addTransactionToExpenseHistory(response)}
-                      RightAccessory={(_props) => (
-                        <Icon color={colors.palette.neutral100} icon="check" />
-                      )}
+          {history
+            .filter((item) => (showOnlyTransactions ? item.isTransaction : true))
+            .map((response) => (
+              <Card
+                key={response.id}
+                preset="reversed"
+                headingStyle={$cardHeadingStyle}
+                heading={response.summary}
+                contentStyle={$cardContentStyle}
+                ContentComponent={
+                  <View>
+                    <Text
+                      style={$cardContentStyle}
+                      text={`Transaction: ${response.isTransaction}`}
                     />
-                    <Button
-                      text="Remove"
-                      preset="default"
-                      style={{ backgroundColor: colors.palette.angry500 }}
-                      onPress={() => deleteTransaction(response.id)}
-                      RightAccessory={(_props) => (
-                        <Icon color={colors.palette.neutral100} icon="x" />
-                      )}
+                    <Text
+                      style={$cardContentStyle}
+                      text={`From: ${response.transactionDetails?.from}`}
                     />
+                    <Text
+                      style={$cardContentStyle}
+                      text={`To: ${response.transactionDetails?.to}`}
+                    />
+                    <Text
+                      style={$cardContentStyle}
+                      text={`App: ${response.transactionDetails?.detectedFromApp}`}
+                    />
+                    <Text style={$cardContentStyle} text={`${response.summary}`} />
+                    <View style={$cardFooterContainer}>
+                      <Button
+                        text="Add to history"
+                        preset="filled"
+                        style={{ backgroundColor: colors.palette.secondary500 }}
+                        onPress={() => addTransactionToExpenseHistory(response)}
+                        RightAccessory={(_props) => (
+                          <Icon color={colors.palette.neutral100} icon="check" />
+                        )}
+                      />
+                      <Button
+                        text="Remove"
+                        preset="default"
+                        style={{ backgroundColor: colors.palette.angry500 }}
+                        onPress={() => deleteTransaction(response.id)}
+                        RightAccessory={(_props) => (
+                          <Icon color={colors.palette.neutral100} icon="x" />
+                        )}
+                      />
+                    </View>
                   </View>
-                </View>
-              }
-              style={{ marginHorizontal: 20, marginVertical: 5 } as ViewStyle}
-            />
-          ))}
+                }
+                style={{ marginHorizontal: 20, marginVertical: 5 } as ViewStyle}
+              />
+            ))}
         </View>
       </Screen>
     )

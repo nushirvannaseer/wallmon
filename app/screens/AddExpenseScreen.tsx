@@ -2,7 +2,7 @@ import { FC, Fragment, useState } from "react"
 import { observer } from "mobx-react-lite"
 import { Alert, View, ViewStyle } from "react-native"
 import { AppStackParamList, AppStackScreenProps } from "@/navigators"
-import { Header, Screen, Text, TextField, Button } from "@/components"
+import { Header, Screen, Text, TextField, Button, Loader } from "@/components"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { spacing } from "@/theme"
 import { geminiApi } from "@/services/api/api"
@@ -16,6 +16,7 @@ interface AddExpenseScreenProps extends AppStackScreenProps<"AddExpense"> {}
 
 export const AddExpenseScreen: FC<AddExpenseScreenProps> = observer(function AddExpenseScreen() {
   const [naturalLanguageExpense, setNaturalLanguageExpense] = useState("")
+  const [isLoading, setIsLoading] = useState<boolean>(false)
   const [expense, setExpense] = useState<Expense | null>({
     name: "",
     amount: 0,
@@ -25,6 +26,7 @@ export const AddExpenseScreen: FC<AddExpenseScreenProps> = observer(function Add
   })
 
   const generateExpense = async () => {
+    setIsLoading(true)
     try {
       const response = await geminiApi.generateContent(
         prompts.generateExpense(naturalLanguageExpense),
@@ -37,6 +39,8 @@ export const AddExpenseScreen: FC<AddExpenseScreenProps> = observer(function Add
     } catch (error) {
       console.error("error", error)
       Alert.alert("Error", `Error generating expense from your prompt: ${error}`)
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -72,7 +76,8 @@ export const AddExpenseScreen: FC<AddExpenseScreenProps> = observer(function Add
         <View style={$form}>
           <Text>Generate from natural language</Text>
           <TextField value={naturalLanguageExpense} onChangeText={setNaturalLanguageExpense} />
-          <Button onPress={() => generateExpense()} text="Generate" />
+
+          {isLoading ? <Loader /> : <Button onPress={() => generateExpense()} text={"Generate"} />}
           <View style={$orContainer}>
             <Text>OR</Text>
           </View>

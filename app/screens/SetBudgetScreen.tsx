@@ -74,14 +74,14 @@ export const SetBudgetScreen: FC<SetBudgetScreenProps> = observer(function SetBu
           onPress={() => navigation.navigate("ExpenseHistory")}
           text="Expense History"
         />
-        <View style={$buttonContainer}>
+        <View style={[$buttonContainer, $clearButtonsContainer]}>
           <Button
-            style={$button}
+            style={$clearButton}
             onPress={() => remove("geminiResponse")}
             text="Clear Notification History"
           />
           <Button
-            style={$button}
+            style={$clearButton}
             onPress={() => remove("expenseHistory")}
             text="Clear Expense History"
           />
@@ -146,4 +146,12 @@ const $editContainer: ViewStyle = {
   justifyContent: "center",
   alignItems: "center",
   width: "100%",
+}
+
+const $clearButtonsContainer: ViewStyle = {
+  padding: 20,
+}
+
+const $clearButton: ViewStyle = {
+  maxWidth: "50%",
 }
