@@ -48,3 +48,9 @@ export interface ApiConfig {
    */
   timeout: number
 }
+
+export interface GeminiApiConfig {
+  url: string
+  timeout: number
+  apiKey: string
+}

@@ -7,4 +7,6 @@
  */
 export default {
   API_URL: "CHANGEME",
+  GEMINI_API_KEY: "CHANGEME",
+  GEMINI_API_URL: "CHANGEME",
 }

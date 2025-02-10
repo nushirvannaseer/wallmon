@@ -12,8 +12,6 @@ import Config from "../config"
 import { navigationRef, useBackButtonHandler } from "./navigationUtilities"
 import { useAppTheme, useThemeProvider } from "@/utils/useAppTheme"
 import { ComponentProps } from "react"
-import { SetBudgetScreen } from "../screens/SetBudgetScreen"
-import { SettingsScreen } from "../screens/SettingsScreen"
 
 /**
  * This type allows TypeScript to know what routes are defined in this navigator
@@ -34,6 +32,8 @@ export type AppStackParamList = {
   SetBudget: undefined
   Settings: undefined
   DetectedTransactions: undefined
+  AddExpense: undefined
+  ExpenseHistory: undefined
   // IGNITE_GENERATOR_ANCHOR_APP_STACK_PARAM_LIST
 }
 
@@ -78,6 +78,8 @@ const AppStack = observer(function AppStack() {
       <Stack.Screen name="SetBudget" component={Screens.SetBudgetScreen} />
       <Stack.Screen name="Settings" component={Screens.SettingsScreen} />
       <Stack.Screen name="DetectedTransactions" component={Screens.DetectedTransactionsScreen} />
+      <Stack.Screen name="AddExpense" component={Screens.AddExpenseScreen} />
+      <Stack.Screen name="ExpenseHistory" component={Screens.ExpenseHistoryScreen} />
       {/* IGNITE_GENERATOR_ANCHOR_APP_STACK_SCREENS */}
     </Stack.Navigator>
   )

@@ -26,6 +26,9 @@ const en = {
       button: "Let's try this again",
     },
   },
+  addExpenseScreen: {
+    title: "Add Expense",
+  },
 }
 
 export default en

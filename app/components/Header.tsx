@@ -182,7 +182,14 @@ export function Header(props: HeaderProps) {
   const titleContent = titleTx ? translate(titleTx, titleTxOptions) : title
 
   return (
-    <View style={[$container, $containerInsets, { backgroundColor }, $containerStyleOverride]}>
+    <View
+      style={[
+        $container,
+        $containerInsets,
+        { backgroundColor: backgroundColor ?? colors.palette.neutral100 },
+        $containerStyleOverride,
+      ]}
+    >
       <View style={[$styles.row, $wrapper, $styleOverride]}>
         <HeaderAction
           tx={leftTx}
@@ -277,6 +284,7 @@ const $wrapper: ViewStyle = {
 
 const $container: ViewStyle = {
   width: "100%",
+  backgroundColor: "darkblue",
 }
 
 const $title: TextStyle = {

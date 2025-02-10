@@ -17,7 +17,6 @@ export const SettingsScreen: FC<SettingsScreenProps> = observer(function Setting
   const checkPermission = async () => {
     const status = await NotificationListener.getPermissionStatus()
     setHasNotificationPermission(status)
-    console.log("status:", status)
     return status
   }
 

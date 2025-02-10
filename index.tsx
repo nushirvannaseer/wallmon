@@ -1,10 +1,12 @@
 import "@expo/metro-runtime" // this is for fast refresh on web w/o expo-router
 import { registerRootComponent } from "expo"
-import { Alert, AppRegistry } from "react-native"
+import { AppRegistry } from "react-native"
 import { App } from "@/app"
-import { GEMINI_API_KEY } from "@env"
+// eslint-disable-next-line import/no-unresolved
 import { load, save } from "@/utils/storage"
-
+import { History, Notification } from "@/types/Storage"
+import { geminiApi } from "@/services/api/api"
+import uuid from "react-native-uuid"
 // Define your headless task
 
 const headlessNotificationListener = async ({ notification }: any) => {
@@ -39,28 +41,6 @@ const headlessNotificationListener = async ({ notification }: any) => {
     extraInfoText,
     groupedMessages,
   } = JSON.parse(notification)
-  console.log(
-    "Notification received in background",
-    "app: ",
-    app,
-    "\ntitle: ",
-    title,
-    "\ntext: ",
-    text,
-    "\ntitleBig: ",
-    titleBig,
-    "\nsubText: ",
-    subText,
-    "\nsummaryText: ",
-    summaryText,
-    "\nbigText: ",
-    bigText,
-    "\nextraInfoText: ",
-    extraInfoText,
-    "\ngroupedMessages: ",
-    groupedMessages,
-  )
-  Alert.prompt("Notification received in background", `${title} - ${text}`)
   const prompt = `
     You are a financial assistant. You are given a notification from an app.
     You are given the following information:
@@ -86,6 +66,8 @@ const headlessNotificationListener = async ({ notification }: any) => {
     - etc.
     Please make sure that random notifications are not classified as financial transactions. Financial transactions may
     however be from the Messaging app, since a lot of financial apps use the Messaging app to send notifications.
+    Do not classify notifications as transactions unless you are 100% sure that it is a financial transaction.
+    It is better to classify a notification as not a transaction than to classify it as a transaction when it is not.
     If it is not from a financial app, you need to respond with:
     {
       "summary": string,
@@ -100,6 +82,9 @@ const headlessNotificationListener = async ({ notification }: any) => {
       "isTransaction": boolean,
       "transactionDetails": {
         "amount": number,
+        "from": string,
+        "to": string,
+        "detectedFromApp": string,
         "type": "deposit" | "withdrawal" | "transfer" | "other",
         "date": string,
         "description": string
@@ -117,39 +102,26 @@ const registerHeadlessTask = () => {
     "RNAndroidNotificationListenerHeadlessJs",
     () => headlessNotificationListener,
   )
-  console.log("Headless task registered")
 }
 
 const callGemini = async (prompt: string) => {
   try {
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [{ text: prompt }],
-            },
-          ],
-        }),
-      },
-    )
+    const response = await geminiApi.generateContent(prompt)
 
-    const data = await response.json()
-    const parsed = JSON.parse(
-      data.candidates[0].content.parts[0].text.replace("```json", "").replace("```", ""),
-    )
-    console.log("Gemini response:", parsed)
-    let history = load<any[]>("geminiResponse") ?? []
-    history = JSON.parse(history.toString())
-    console.log("\nHistory:", history, typeof history)
-    history.push(parsed)
-    save("geminiResponse", JSON.stringify(history))
-    return parsed
+    const storedHistory = await load("geminiResponse")
+    let history: History = []
+
+    if (storedHistory) {
+      try {
+        history = JSON.parse(storedHistory.toString())
+      } catch {
+        history = []
+      }
+    }
+
+    history.push({ ...response, id: uuid.v4() } as Notification)
+    await save("geminiResponse", JSON.stringify(history))
+    return response
   } catch (error) {
     console.error("Error calling Gemini:", error)
     throw error
