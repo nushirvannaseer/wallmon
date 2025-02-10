@@ -46,54 +46,51 @@ export const DetectedTransactionsScreen: FC<DetectedTransactionsScreenProps> = o
       <Screen style={$root} preset="scroll" safeAreaEdges={["top", "bottom"]}>
         <Text text="detectedTransactions" />
         <View>
-          {history
-            .filter((item) => item.isTransaction)
-            .map((response) => (
-              <Card
-                key={response.id}
-                preset="reversed"
-                headingStyle={$cardHeadingStyle}
-                heading={response.summary}
-                contentStyle={$cardContentStyle}
-                ContentComponent={
-                  <View>
-                    <Text
-                      style={$cardContentStyle}
-                      text={`From: ${response.transactionDetails?.from}`}
+          {history.map((response) => (
+            <Card
+              key={response.id}
+              preset="reversed"
+              headingStyle={$cardHeadingStyle}
+              heading={response.summary}
+              contentStyle={$cardContentStyle}
+              ContentComponent={
+                <View>
+                  <Text style={$cardContentStyle} text={`Transaction: ${response.isTransaction}`} />
+                  <Text
+                    style={$cardContentStyle}
+                    text={`From: ${response.transactionDetails?.from}`}
+                  />
+                  <Text style={$cardContentStyle} text={`To: ${response.transactionDetails?.to}`} />
+                  <Text
+                    style={$cardContentStyle}
+                    text={`App: ${response.transactionDetails?.detectedFromApp}`}
+                  />
+                  <Text style={$cardContentStyle} text={`${response.summary}`} />
+                  <View style={$cardFooterContainer}>
+                    <Button
+                      text="Add to history"
+                      preset="filled"
+                      style={{ backgroundColor: colors.palette.secondary500 }}
+                      onPress={() => addTransactionToExpenseHistory(response)}
+                      RightAccessory={(_props) => (
+                        <Icon color={colors.palette.neutral100} icon="check" />
+                      )}
                     />
-                    <Text
-                      style={$cardContentStyle}
-                      text={`To: ${response.transactionDetails?.to}`}
+                    <Button
+                      text="Remove"
+                      preset="default"
+                      style={{ backgroundColor: colors.palette.angry500 }}
+                      onPress={() => deleteTransaction(response.id)}
+                      RightAccessory={(_props) => (
+                        <Icon color={colors.palette.neutral100} icon="x" />
+                      )}
                     />
-                    <Text
-                      style={$cardContentStyle}
-                      text={`App: ${response.transactionDetails?.detectedFromApp}`}
-                    />
-                    <View style={$cardFooterContainer}>
-                      <Button
-                        text="Add to history"
-                        preset="filled"
-                        style={{ backgroundColor: colors.palette.secondary500 }}
-                        onPress={() => addTransactionToExpenseHistory(response)}
-                        RightAccessory={(_props) => (
-                          <Icon color={colors.palette.neutral100} icon="check" />
-                        )}
-                      />
-                      <Button
-                        text="Remove"
-                        preset="default"
-                        style={{ backgroundColor: colors.palette.angry500 }}
-                        onPress={() => deleteTransaction(response.id)}
-                        RightAccessory={(_props) => (
-                          <Icon color={colors.palette.neutral100} icon="x" />
-                        )}
-                      />
-                    </View>
                   </View>
-                }
-                style={{ marginHorizontal: 20, marginVertical: 5 } as ViewStyle}
-              />
-            ))}
+                </View>
+              }
+              style={{ marginHorizontal: 20, marginVertical: 5 } as ViewStyle}
+            />
+          ))}
         </View>
       </Screen>
     )

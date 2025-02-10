@@ -3,7 +3,7 @@ import { observer } from "mobx-react-lite"
 import { TextStyle, View, ViewStyle } from "react-native"
 import { AppStackParamList, AppStackScreenProps } from "@/navigators"
 import { Screen, Text, Button, TextField, Header } from "@/components"
-import { loadString, saveString } from "@/utils/storage"
+import { loadString, remove, saveString } from "@/utils/storage"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { colors } from "@/theme"
 
@@ -74,6 +74,18 @@ export const SetBudgetScreen: FC<SetBudgetScreenProps> = observer(function SetBu
           onPress={() => navigation.navigate("ExpenseHistory")}
           text="Expense History"
         />
+        <View style={$buttonContainer}>
+          <Button
+            style={$button}
+            onPress={() => remove("geminiResponse")}
+            text="Clear Notification History"
+          />
+          <Button
+            style={$button}
+            onPress={() => remove("expenseHistory")}
+            text="Clear Expense History"
+          />
+        </View>
       </Screen>
     </Fragment>
   )
